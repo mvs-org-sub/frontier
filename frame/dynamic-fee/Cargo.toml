@@ -7,14 +7,14 @@ description = "Dynamic fee handling for EVM."
 license = "Apache-2.0"
 
 [dependencies]
-codec = { package = "parity-scale-codec", version = "1.0.0", default-features = false }
+codec = { package = "parity-scale-codec", version = "2.0.0", default-features = false }
 serde = { version = "1.0.101", optional = true }
-sp-std = { version = "2.0.0-dev", git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
-sp-core = { version = "2.0.0-dev", git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
-sp-runtime = { version = "2.0.0-dev", git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
-sp-inherents = { version = "2.0.0-dev", git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
-frame-system = { version = "2.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
-frame-support = { version = "2.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+sp-std = { git = "https://github.com/paritytech/substrate.git", tag = "v3.0.0" }
+sp-core = { git = "https://github.com/paritytech/substrate.git", tag = "v3.0.0" }
+sp-runtime = { git = "https://github.com/paritytech/substrate.git", tag = "v3.0.0" }
+sp-inherents = { git = "https://github.com/paritytech/substrate.git", tag = "v3.0.0" }
+frame-system = { default-features = false, git = "https://github.com/paritytech/substrate.git", tag = "v3.0.0" }
+frame-support = { default-features = false, git = "https://github.com/paritytech/substrate.git", tag = "v3.0.0" }
 
 [features]
 default = ["std"]
