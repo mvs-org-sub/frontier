@@ -13,7 +13,6 @@ pub use sc_executor::NativeExecutor;
 use sp_consensus_aura::sr25519::{AuthorityPair as AuraPair};
 use sc_finality_grandpa::SharedVoterState;
 use sp_timestamp::InherentError;
-use sc_telemetry::TelemetrySpan;
 use crate::cli::Sealing;
 
 // Our native executor instance.
