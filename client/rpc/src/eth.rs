@@ -198,6 +198,27 @@ fn transaction_build(
 	}
 }
 
+type InternalTxDetails = fc_rpc_core::types::InternalTxDetails;
+trait FromEthInternalTx {
+    fn from(_: &pallet_ethereum::InternalTxDetails) -> Self;
+}
+
+impl FromEthInternalTx for InternalTxDetails {
+    fn from(tx_details: &pallet_ethereum::InternalTxDetails) -> Self {
+		InternalTxDetails {
+			tx: fc_rpc_core::types::InternalTransaction {
+				from: Some(tx_details.tx.parent),
+				to: Some(tx_details.tx.node),
+				gas_used: Some(tx_details.tx.gas_used),
+			},
+			reward: tx_details.reward.as_ref().map(|reward| fc_rpc_core::types::RewardInfo {
+				developer: reward.developer,
+				reward: reward.reward,
+			}),
+		}
+	}
+}
+
 fn logs_build(
 	filter: Filter,
 	blocks_and_statuses: Vec<(EthereumBlock, Vec<TransactionStatus>)>
@@ -1085,6 +1106,9 @@ impl<B, C, P, CT, BE, H: ExHashT> EthApiT for EthApi<B, C, P, CT, BE, H> where
 					status_code: Some(U64::from(receipt.state_root.to_low_u64_be())),
 					logs_bloom: receipt.logs_bloom,
 					state_root: None,
+					internal_transactions:  status.internal_transactions.iter()
+												.map(|tx| FromEthInternalTx::from(&tx))
+												.collect(),
 				}))
 			}
 			_ => Ok(None),

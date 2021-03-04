@@ -44,6 +44,8 @@ use sha3::{Digest, Keccak256};
 use codec::{Encode, Decode};
 use fp_consensus::{FRONTIER_ENGINE_ID, ConsensusLog};
 
+pub use fp_evm::InternalTxDetails;
+
 pub use fp_rpc::TransactionStatus;
 pub use ethereum::{Transaction, Log, Block, Receipt, TransactionAction, TransactionMessage};
 
@@ -166,6 +168,7 @@ decl_module! {
 							);
 							bloom
 						},
+						internal_transactions: info.internal_txs,
 					}, info.used_gas)
 				},
 				CallOrCreateInfo::Create(info) => {
@@ -184,6 +187,7 @@ decl_module! {
 							);
 							bloom
 						},
+						internal_transactions: info.internal_txs,
 					}, info.used_gas)
 				},
 			};

@@ -18,6 +18,8 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 mod precompile;
+mod internal_transaction;
+pub use self::internal_transaction::{InternalTxDetails, RewardInfo, };
 
 use codec::{Encode, Decode};
 #[cfg(feature = "std")]
@@ -26,7 +28,7 @@ use sp_std::vec::Vec;
 use sp_core::{U256, H160};
 use evm::ExitReason;
 
-pub use evm::backend::{Basic as Account, Log};
+pub use evm::backend::{Basic as Account, Log, InternalTransaction, };
 pub use precompile::{Precompile, PrecompileSet, LinearCostPrecompile};
 
 #[derive(Clone, Eq, PartialEq, Encode, Decode, Default)]
@@ -46,6 +48,7 @@ pub struct ExecutionInfo<T> {
 	pub value: T,
 	pub used_gas: U256,
 	pub logs: Vec<Log>,
+	pub internal_txs: Vec<InternalTxDetails>,
 }
 
 pub type CallInfo = ExecutionInfo<Vec<u8>>;

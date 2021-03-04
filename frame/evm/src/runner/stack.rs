@@ -29,11 +29,14 @@ use fp_evm::{ExecutionInfo, CallInfo, CreateInfo, Log, Vicinity};
 use evm::{ExitReason, ExitError, Transfer};
 use evm::backend::Backend as BackendT;
 use evm::executor::{StackExecutor, StackSubstateMetadata, StackState as StackStateT};
+use fp_evm::{ InternalTxDetails, RewardInfo, };
+use hex_slice::AsHex;
 use crate::{
 	Config, AccountStorages, FeeCalculator, AccountCodes, Module, Event,
 	Error, AddressMapping, PrecompileSet,
 };
 use crate::runner::Runner as RunnerT;
+use crate::AccountConnection;
 
 #[derive(Default)]
 pub struct Runner<T: Config> {
@@ -103,6 +106,28 @@ impl<T: Config> Runner<T> {
 
 		Module::<T>::deposit_fee(&source, total_fee.saturating_sub(actual_fee));
 
+		// distribute gas reward to smart contract deployers @ gnufoo
+		let internal_transactions = executor.call_graph.clone();
+		let dev_bonus = actual_fee.saturating_mul(U256::from(4)).checked_div(U256::from(10));
+		let mut total_gas = U256::zero();
+		for item in &internal_transactions {
+			total_gas = total_gas.saturating_add(item.gas_used);
+		}
+
+		let tx_details = internal_transactions.into_iter().map(|tx| {
+			let reward = AccountConnection::get(tx.node).and_then(|candidate| {
+				let amount = dev_bonus.unwrap_or(U256::zero()).saturating_mul(tx.gas_used).checked_div(total_gas);
+				 amount.map(|amount| {
+				    Module::<T>::deposit_fee(&candidate, amount);
+					RewardInfo { developer: candidate, reward: amount, }
+				})
+			});
+
+			InternalTxDetails {
+				tx, reward,
+			}
+		}).collect();
+
 		let state = executor.into_state();
 
 		for address in state.substate.deletes {
@@ -136,6 +161,7 @@ impl<T: Config> Runner<T> {
 			exit_reason: reason,
 			used_gas,
 			logs: state.substate.logs,
+			internal_txs: tx_details,
 		})
 	}
 }
@@ -190,6 +216,9 @@ impl<T: Config> RunnerT<T> for Runner<T> {
 				let address = executor.create_address(
 					evm::CreateScheme::Legacy { caller: source },
 				);
+				debug::info!("CLOVER EVM CREATE [deployer: {:?}, address: {:?}, code: {:02x}]", source, address, init.as_hex());
+				AccountConnection::insert(address, source);
+
 				(executor.transact_create(
 					source,
 					value,

@@ -31,6 +31,7 @@ mod sync;
 mod transaction;
 mod transaction_request;
 mod work;
+mod internal_transaction;
 
 pub mod pubsub;
 
@@ -55,3 +56,4 @@ pub use self::transaction::{
 };
 pub use self::transaction_request::TransactionRequest;
 pub use self::work::Work;
+pub use self::internal_transaction:: { InternalTransaction, RewardInfo, InternalTxDetails };

@@ -1193,9 +1193,8 @@ checksum = "f7531096570974c3a9dcf9e4b8e1cede1ec26cf5046219fb3b9d897503b9be59"
 
 [[package]]
 name = "evm"
-version = "0.24.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0467250a12bb144ad7b2f41e03e8675e38b971ab73f6d42ede6b78af07657e7b"
+version = "0.24.0-clover"
+source = "git+https://github.com/clover-network/evm.git?tag=v0.24.0-clover#e0d0dc088505d955c1fdff36c9560ab346d1d898"
 dependencies = [
  "ethereum",
  "evm-core",
@@ -1211,9 +1210,8 @@ dependencies = [
 
 [[package]]
 name = "evm-core"
-version = "0.24.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2f0db0394d7b497bf97be3d9ece9c828f8b7670a065fc9f3106c9598cce6556d"
+version = "0.24.0-clover"
+source = "git+https://github.com/clover-network/evm.git?tag=v0.24.0-clover#e0d0dc088505d955c1fdff36c9560ab346d1d898"
 dependencies = [
  "funty",
  "parity-scale-codec 2.0.1",
@@ -1223,9 +1221,8 @@ dependencies = [
 
 [[package]]
 name = "evm-gasometer"
-version = "0.24.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c617616408f87be6826bda72cee7625aa8cbc09b759f05b1dccd329fb61b2077"
+version = "0.24.0-clover"
+source = "git+https://github.com/clover-network/evm.git?tag=v0.24.0-clover#e0d0dc088505d955c1fdff36c9560ab346d1d898"
 dependencies = [
  "evm-core",
  "evm-runtime",
@@ -1234,9 +1231,8 @@ dependencies = [
 
 [[package]]
 name = "evm-runtime"
-version = "0.24.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8447504daa86bc5a7ae982b9b5c53225aa0ebcfba636b785cf0f53406eaa4d87"
+version = "0.24.0-clover"
+source = "git+https://github.com/clover-network/evm.git?tag=v0.24.0-clover#e0d0dc088505d955c1fdff36c9560ab346d1d898"
 dependencies = [
  "evm-core",
  "primitive-types 0.9.0",
@@ -2107,6 +2103,12 @@ name = "hex"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "644f9158b2f133fd50f5fb3242878846d9eb792e445c893805ff0e3824006e35"
+
+[[package]]
+name = "hex-slice"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5491a308e0214554f07a81d8944abe45f552871c12e3c3c6e7e5d354039a6c4c"
 
 [[package]]
 name = "hex_fmt"
@@ -3875,6 +3877,7 @@ dependencies = [
  "fp-evm",
  "frame-support",
  "frame-system",
+ "hex-slice",
  "pallet-balances",
  "pallet-timestamp",
  "parity-scale-codec 2.0.1",

@@ -32,6 +32,7 @@ pub struct TransactionStatus {
 	pub contract_address: Option<H160>,
 	pub logs: Vec<Log>,
 	pub logs_bloom: Bloom,
+	pub internal_transactions: Vec<fp_evm::InternalTxDetails>,
 }
 
 impl Default for TransactionStatus {
@@ -44,6 +45,7 @@ impl Default for TransactionStatus {
 			contract_address: None,
 			logs: Vec::new(),
 			logs_bloom: Bloom::default(),
+			internal_transactions: Vec::new(),
 		}
 	}
 }
