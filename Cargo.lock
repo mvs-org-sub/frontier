@@ -1290,6 +1290,7 @@ name = "fc-consensus"
 version = "0.1.0-clover"
 dependencies = [
  "derive_more",
+ "fc-db",
  "fp-consensus",
  "fp-rpc",
  "futures 0.3.13",
@@ -1308,12 +1309,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "fc-db"
+version = "0.1.0"
+dependencies = [
+ "kvdb",
+ "kvdb-rocksdb",
+ "parity-scale-codec 2.0.1",
+ "parking_lot 0.11.1",
+ "sp-core",
+ "sp-database",
+ "sp-runtime",
+]
+
+[[package]]
 name = "fc-rpc"
 version = "0.1.0-clover"
 dependencies = [
  "ethereum",
  "ethereum-types",
  "fc-consensus",
+ "fc-db",
  "fc-rpc-core",
  "fp-rpc",
  "futures 0.3.13",
@@ -1622,6 +1637,7 @@ name = "frontier-template-node"
 version = "2.0.0-dev"
 dependencies = [
  "fc-consensus",
+ "fc-db",
  "fc-rpc",
  "fc-rpc-core",
  "fp-consensus",
