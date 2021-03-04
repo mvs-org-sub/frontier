@@ -19,9 +19,10 @@
 
 use super::*;
 use crate::{Module, Config, IntermediateStateRoot};
+use crate as eth_module;
 use ethereum::{TransactionAction, TransactionSignature};
 use frame_support::{
-	impl_outer_origin, parameter_types, ConsensusEngineId
+	parameter_types, ConsensusEngineId
 };
 use pallet_evm::{FeeCalculator, AddressMapping, EnsureAddressTruncated};
 use rlp::*;
@@ -33,15 +34,6 @@ use sp_runtime::{
 };
 use sp_runtime::AccountId32;
 
-impl_outer_origin! {
-	pub enum Origin for Test where system = frame_system {}
-}
-
-// For testing the pallet, we construct most of a mock runtime. This means
-// first constructing a configuration type (`Test`) which `impl`s each of the
-// configuration traits of pallets we want to use.
-#[derive(Clone, Eq, PartialEq)]
-pub struct Test;
 parameter_types! {
 	pub const BlockHashCount: u64 = 250;
 	pub BlockWeights: frame_system::limits::BlockWeights =
@@ -56,7 +48,7 @@ impl frame_system::Config for Test {
 	type Index = u64;
 	type BlockNumber = u64;
 	type Hash = H256;
-	type Call = ();
+	type Call = Call;
 	type Hashing = BlakeTwo256;
 	type AccountId = AccountId32;
 	type Lookup = IdentityLookup<Self::AccountId>;
@@ -64,7 +56,7 @@ impl frame_system::Config for Test {
 	type Event = ();
 	type BlockHashCount = BlockHashCount;
 	type Version = ();
-	type PalletInfo = ();
+	type PalletInfo = PalletInfo;
 	type AccountData = pallet_balances::AccountData<u64>;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
@@ -156,10 +148,26 @@ impl Config for Test {
 	type BlockGasLimit = BlockGasLimit;
 }
 
-pub type System = frame_system::Module<Test>;
-pub type Balances = pallet_balances::Module<Test>;
-pub type Ethereum = Module<Test>;
-pub type Evm = pallet_evm::Module<Test>;
+//pub type System = frame_system::Module<Test>;
+//pub type Balances = pallet_balances::Module<Test>;
+//pub type Ethereum = Module<Test>;
+//pub type Evm = pallet_evm::Module<Test>;
+type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
+type Block = frame_system::mocking::MockBlock<Test>;
+
+frame_support::construct_runtime!(
+	pub enum Test where
+		Block = Block,
+		NodeBlock = Block,
+		UncheckedExtrinsic = UncheckedExtrinsic
+	{
+		System: frame_system::{Module, Call, Config, Storage, Event<T>},
+		Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
+		Ethereum: eth_module::{Module, Call, Storage, Config, Event, ValidateUnsigned },
+		Evm: pallet_evm::{Module, Call, Storage, Config, Event<T>},
+	}
+);
+
 
 pub struct AccountInfo {
 	pub address: H160,

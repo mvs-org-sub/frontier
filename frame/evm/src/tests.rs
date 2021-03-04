@@ -19,9 +19,11 @@
 
 use super::*;
 
+use crate as pallet_evm;
+
 use std::{str::FromStr, collections::BTreeMap};
 use frame_support::{
-	assert_ok, impl_outer_origin, parameter_types, impl_outer_dispatch,
+	assert_ok, parameter_types,
 };
 use sp_core::{Blake2Hasher, H256};
 use sp_runtime::{
@@ -29,18 +31,6 @@ use sp_runtime::{
 	traits::{BlakeTwo256, IdentityLookup},
 };
 
-impl_outer_origin! {
-	pub enum Origin for Test where system = frame_system {}
-}
-
-impl_outer_dispatch! {
-	pub enum OuterCall for Test where origin: Origin {
-		self::EVM,
-	}
-}
-
-#[derive(Clone, Eq, PartialEq)]
-pub struct Test;
 parameter_types! {
 	pub const BlockHashCount: u64 = 250;
 	pub BlockWeights: frame_system::limits::BlockWeights =
@@ -55,7 +45,7 @@ impl frame_system::Config for Test {
 	type Index = u64;
 	type BlockNumber = u64;
 	type Hash = H256;
-	type Call = OuterCall;
+	type Call = Call;
 	type Hashing = BlakeTwo256;
 	type AccountId = AccountId32;
 	type Lookup = IdentityLookup<Self::AccountId>;
@@ -63,7 +53,7 @@ impl frame_system::Config for Test {
 	type Event = ();
 	type BlockHashCount = BlockHashCount;
 	type Version = ();
-	type PalletInfo = ();
+	type PalletInfo = PalletInfo;
 	type AccountData = pallet_balances::AccountData<u64>;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
@@ -114,14 +104,29 @@ impl Config for Test {
 	type Currency = Balances;
 	type Runner = crate::runner::stack::Runner<Self>;
 
-	type Event = Event<Test>;
+	type Event = ();
 	type Precompiles = ();
 	type ChainId = ();
 }
 
-type System = frame_system::Module<Test>;
-type Balances = pallet_balances::Module<Test>;
-type EVM = Module<Test>;
+//type System = frame_system::Module<Test>;
+//type Balances = pallet_balances::Module<Test>;
+//type EVM = Module<Test>;
+
+type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
+type Block = frame_system::mocking::MockBlock<Test>;
+
+frame_support::construct_runtime!(
+	pub enum Test where
+		Block = Block,
+		NodeBlock = Block,
+		UncheckedExtrinsic = UncheckedExtrinsic
+	{
+		System: frame_system::{Module, Call, Config, Storage, Event<T>},
+		Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
+		EVM: pallet_evm::{Module, Call, Storage, Config, Event<T>},
+	}
+);
 
 pub fn new_test_ext() -> sp_io::TestExternalities {
 	let mut t = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap();
@@ -151,7 +156,7 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
 	);
 
 	pallet_balances::GenesisConfig::<Test>::default().assimilate_storage(&mut t).unwrap();
-	GenesisConfig { accounts }.assimilate_storage::<Test>(&mut t).unwrap();
+	pallet_evm::GenesisConfig { accounts }.assimilate_storage::<Test>(&mut t).unwrap();
 	t.into()
 }
 
