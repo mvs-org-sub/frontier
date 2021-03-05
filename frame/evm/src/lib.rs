@@ -63,14 +63,14 @@ pub use fp_evm::{
 };
 pub use evm::{ExitReason, ExitSucceed, ExitError, ExitRevert, ExitFatal};
 
-use sp_std::vec::Vec;
+use sp_std::{marker::PhantomData, vec::Vec};
 #[cfg(feature = "std")]
 use codec::{Encode, Decode};
 #[cfg(feature = "std")]
 use serde::{Serialize, Deserialize};
 use frame_support::{decl_module, decl_storage, decl_event, decl_error};
 use frame_support::weights::{Weight, Pays, PostDispatchInfo};
-use frame_support::traits::{Currency, ExistenceRequirement, Get, WithdrawReasons};
+use frame_support::traits::{Currency, ExistenceRequirement, Get, OnKilledAccount, WithdrawReasons};
 use frame_support::dispatch::DispatchResultWithPostInfo;
 use frame_system::RawOrigin;
 use sp_core::{U256, H256, H160, Hasher};
@@ -185,6 +185,7 @@ impl<OuterOrigin> EnsureAddressOrigin<OuterOrigin> for EnsureAddressTruncated wh
 
 pub trait AddressMapping<A> {
 	fn into_account_id(address: H160) -> A;
+	fn to_evm_address(account: &A) -> Option<H160>;
 }
 
 /// Identity address mapping.
@@ -192,6 +193,9 @@ pub struct IdentityAddressMapping;
 
 impl AddressMapping<H160> for IdentityAddressMapping {
 	fn into_account_id(address: H160) -> H160 { address }
+	fn to_evm_address(account: &H160) -> Option<H160> {
+		Some(account.clone())
+	}
 }
 
 /// Hashed address mapping.
@@ -205,6 +209,11 @@ impl<H: Hasher<Out=H256>> AddressMapping<AccountId32> for HashedAddressMapping<H
 		let hash = H::hash(&data);
 
 		AccountId32::from(Into::<[u8; 32]>::into(hash))
+	}
+
+	fn to_evm_address(account: &AccountId32) -> Option<H160> {
+		// we're not able to recover the evm address from a hashed address
+		None
 	}
 }
 
@@ -581,5 +590,14 @@ impl<T: Config> Module<T> {
 			&account_id,
 			value.low_u128().unique_saturated_into(),
 		));
+	}
+}
+
+pub struct CallKillAccount<T>(PhantomData<T>);
+impl<T: Config> OnKilledAccount<T::AccountId> for CallKillAccount<T> {
+	fn on_killed_account(who: &T::AccountId) {
+		if let Some(address) = T::AddressMapping::to_evm_address(who) {
+			Module::<T>::remove_account(&address)
+		}
 	}
 }

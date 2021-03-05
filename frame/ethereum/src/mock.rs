@@ -122,6 +122,10 @@ impl AddressMapping<AccountId32> for HashedAddressMapping {
 		data[0..20].copy_from_slice(&address[..]);
 		AccountId32::from(Into::<[u8; 32]>::into(data))
 	}
+
+	fn to_evm_address(account_id: &AccountId32) -> Option<H160> {
+		None
+	}
 }
 
 impl pallet_evm::Config for Test {
