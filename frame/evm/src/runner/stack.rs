@@ -33,7 +33,7 @@ use fp_evm::{ InternalTxDetails, RewardInfo, };
 use hex_slice::AsHex;
 use crate::{
 	Config, AccountStorages, FeeCalculator, AccountCodes, Module, Event,
-	Error, AddressMapping, PrecompileSet,
+	Error, AddressMapping, PrecompileSet, OnChargeEVMTransaction
 };
 use crate::runner::Runner as RunnerT;
 use crate::AccountConnection;
@@ -84,12 +84,14 @@ impl<T: Config> Runner<T> {
 		let source_account = Module::<T>::account_basic(&source);
 		ensure!(source_account.balance >= total_payment, Error::<T>::BalanceLow);
 
-		Module::<T>::withdraw_fee(&source, total_fee)?;
-
 		if let Some(nonce) = nonce {
 			ensure!(source_account.nonce == nonce, Error::<T>::InvalidNonce);
 		}
 
+		// Deduct fee from the `source` account.
+		let fee = T::OnChargeTransaction::withdraw_fee(&source, total_fee)?;
+
+		// Execute the EVM call.
 		let (reason, retv) = f(&mut executor);
 
 		let used_gas = U256::from(executor.used_gas());
@@ -104,7 +106,8 @@ impl<T: Config> Runner<T> {
 			actual_fee
 		);
 
-		Module::<T>::deposit_fee(&source, total_fee.saturating_sub(actual_fee));
+		// Refund fees to the `source` account if deducted more before,
+		T::OnChargeTransaction::correct_and_deposit_fee(&source, actual_fee, fee)?;
 
 		// distribute gas reward to smart contract deployers @ gnufoo
 		let internal_transactions = executor.call_graph.clone();
