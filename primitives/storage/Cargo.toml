@@ -1,0 +1,30 @@
+[package]
+name = "fp-storage"
+version = "0.1.0"
+authors = ["Parity Technologies <admin@parity.io"]
+edition = "2018"
+description = "Storage primitives for Ethereum RPC (web3) compatibility layer for Substrate."
+license = "Apache-2.0"
+
+[dependencies]
+sp-core = { git = "https://github.com/paritytech/substrate.git", tag = "v3.0.0", default-features = false }
+sp-api = { git = "https://github.com/paritytech/substrate.git", tag = "v3.0.0", default-features = false }
+fp-evm = { version = "0.8.0-clover", default-features = false, path = "../../primitives/evm" }
+ethereum = { version = "0.7", default-features = false, features = ["with-codec"] }
+ethereum-types = { version = "0.11", default-features = false }
+codec = { package = "parity-scale-codec", version = "2.0", default-features = false }
+sp-runtime = { git = "https://github.com/paritytech/substrate.git", tag = "v3.0.0", default-features = false }
+sp-std = { git = "https://github.com/paritytech/substrate.git", tag = "v3.0.0", default-features = false }
+
+[features]
+default = ["std"]
+std = [
+	"sp-core/std",
+	"sp-api/std",
+	"fp-evm/std",
+	"ethereum/std",
+	"ethereum-types/std",
+	"codec/std",
+	"sp-runtime/std",
+	"sp-std/std",
+]
