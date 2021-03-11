@@ -290,6 +290,7 @@ impl pallet_evm::Config for Runtime {
 		pallet_evm_precompile_simple::Ripemd160,
 		pallet_evm_precompile_simple::Identity,
 	);
+	type BanlistChecker = ();
 	type ChainId = ChainId;
 }
 

@@ -90,6 +90,22 @@ impl FeeCalculator for () {
 	fn min_gas_price() -> U256 { U256::zero() }
 }
 
+/// Trait to allow banned contrat address checking
+/// banned address will be disabled and can't be invoked.
+pub trait BanlistChecker {
+	/// return whether the address is banned
+	fn is_banned(address: &H160) -> bool;
+	/// gas fee if a blacklisted address was called
+	fn banned_gas_fee() -> U256;
+}
+
+/// default implementation
+/// skip ban list checking
+impl BanlistChecker for () {
+	fn is_banned(_: &H160) -> bool { false }
+	fn banned_gas_fee() -> U256 { U256::zero() }
+}
+
 pub trait EnsureAddressOrigin<OuterOrigin> {
 	/// Success return type.
 	type Success;
@@ -260,6 +276,8 @@ pub trait Config: frame_system::Config + pallet_timestamp::Config {
 	type ChainId: Get<u64>;
 	/// EVM execution runner.
 	type Runner: Runner<Self>;
+
+	type BanlistChecker: BanlistChecker;
 
 	/// EVM config used in the module.
 	fn config() -> &'static EvmConfig {

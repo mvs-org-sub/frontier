@@ -138,6 +138,7 @@ impl pallet_evm::Config for Test {
 	type Event = ();
 	type Precompiles = ();
 	type Runner = pallet_evm::runner::stack::Runner<Self>;
+	type BanlistChecker = ();
 	type ChainId = ChainId;
 }
 

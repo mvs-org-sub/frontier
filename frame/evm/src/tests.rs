@@ -106,6 +106,7 @@ impl Config for Test {
 
 	type Event = ();
 	type Precompiles = ();
+	type BanlistChecker = ();
 	type ChainId = ();
 }
 
