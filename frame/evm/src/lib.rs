@@ -54,6 +54,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 mod tests;
+mod tests_banlist;
 pub mod runner;
 
 pub use crate::runner::Runner;
@@ -96,14 +97,14 @@ pub trait BanlistChecker {
 	/// return whether the address is banned
 	fn is_banned(address: &H160) -> bool;
 	/// gas fee if a blacklisted address was called
-	fn banned_gas_fee() -> U256;
+	fn banned_gas_fee() -> u64;
 }
 
 /// default implementation
 /// skip ban list checking
 impl BanlistChecker for () {
 	fn is_banned(_: &H160) -> bool { false }
-	fn banned_gas_fee() -> U256 { U256::zero() }
+	fn banned_gas_fee() -> u64 { 0 }
 }
 
 pub trait EnsureAddressOrigin<OuterOrigin> {
@@ -227,7 +228,7 @@ impl<H: Hasher<Out=H256>> AddressMapping<AccountId32> for HashedAddressMapping<H
 		AccountId32::from(Into::<[u8; 32]>::into(hash))
 	}
 
-	fn to_evm_address(account: &AccountId32) -> Option<H160> {
+	fn to_evm_address(_account: &AccountId32) -> Option<H160> {
 		// we're not able to recover the evm address from a hashed address
 		None
 	}

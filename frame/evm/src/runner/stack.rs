@@ -37,6 +37,7 @@ use crate::{
 };
 use crate::runner::Runner as RunnerT;
 use crate::AccountConnection;
+use crate::BanlistChecker;
 
 #[derive(Default)]
 pub struct Runner<T: Config> {
@@ -431,6 +432,14 @@ impl<'vicinity, 'config, T: Config> BackendT for SubstrateStackState<'vicinity, 
 
 	fn original_storage(&self, _address: H160, _index: H256) -> Option<H256> {
 		None
+	}
+
+	fn code_in_banlist(&self, address: H160) -> bool {
+		T::BanlistChecker::is_banned(&address)
+	}
+
+	fn banlist_call_gas(&self) -> u64 {
+		T::BanlistChecker::banned_gas_fee()
 	}
 }
 
